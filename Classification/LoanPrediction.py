@@ -3,7 +3,15 @@ import numpy as np
 from sklearn.preprocessing import MinMaxScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LogisticRegression
+from sklearn.metrics import confusion_matrix
 import logging
+import warnings
+
+
+warnings.simplefilter(action='ignore', category=FutureWarning)
+warnings.simplefilter(action='ignore', category=UserWarning)
+warnings.simplefilter(action='ignore', category=pd.errors.SettingWithCopyWarning)
+
 
 logging.basicConfig(
     filename='LoanPrediction.log',
@@ -73,4 +81,19 @@ logisticReg.fit(X_train, y_train)
 
 predictions = logisticReg.predict(X_test)
 
-print(logisticReg.score(X_test, y_test))
+try:
+    res = pd.DataFrame({
+        'actual_test': y_test,
+        'predicted_value': predictions,
+        'Model Training Score': logisticReg.score(X_test, y_test),
+    }).to_csv('Classification/data/test_output.csv')
+    print("Done")
+
+except Exception as e:
+    print(e)
+
+
+
+print(f"Model Score for a Trained data {logisticReg.score(X_train, y_train)}")
+print(f"Model score for a Testing Data {logisticReg.score(X_test, y_test)}")
+print(confusion_matrix(y_test, predictions))
